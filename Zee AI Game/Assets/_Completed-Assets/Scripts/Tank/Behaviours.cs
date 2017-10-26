@@ -160,19 +160,13 @@ namespace Complete
                 new Service(0.2f, UpdatePerception,
                     new Selector(
 
-                        new BlackboardCondition("targetOnRight", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
+                        new BlackboardCondition("targetInFront", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
 
-                            new Action(() => Move(randomMove))),
-
-                            new BlackboardCondition("targetInFront", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
-
-                             new Action(() => Fire(1))),
-
-                            new BlackboardCondition("targetInFront", Operator.IS_EQUAL, false, Stops.IMMEDIATE_RESTART,
-
-                             new Action(() => Fire(0)))
+                            new Sequence(new Action(() => Move(1)), new Action(() => Fire(1))))
 
                             
+
+                                                        
                     )
                 )
             );
