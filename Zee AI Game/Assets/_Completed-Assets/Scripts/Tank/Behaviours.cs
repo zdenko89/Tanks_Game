@@ -24,14 +24,14 @@ namespace Complete
                 case 5:
                     return TrackBehaviour();
                 case 0:
-                    return Fun();
+                    return MrSuicide(); // Fun();
                 case 1:
-                    return Deadly(); 
+                    return PossiblyDeadly(); //Deadly();
                 case 2:
-                    return Frightened();
+                    return TooFrightened(); //Frightened();
                 case 3:
-                    return Unpredictable(tankSpeed);
-                
+                    return TrulyFunny(tankSpeed); //Unpredictable();
+
 
                 default:
                     return new Root (new Action(()=> Turn(0.1f)));
@@ -76,19 +76,22 @@ namespace Complete
         }
 
 //---------------------------------------------------------------Fun behaviour ---------------------------------------------------------------
-        private Root Fun()
+        private Root MrSuicide()
         {
+            //My initial idea was to create a suicidal AI for this and that is what I achieved.
             return new Root(
                 new Service(0.2f, UpdatePerception,
                     new Selector(
                             new BlackboardCondition("targetOffCentre", Operator.IS_SMALLER_OR_EQUAL, 0.5f, Stops.IMMEDIATE_RESTART,
-
+                            //if the AI tank's centre position is facing the non AI within 0.5f (pixels) then stop turning, wait 
+                            //and then randomly fire
                             new Sequence(StopTurning(), new Wait(1f), RandomFire())),
 
                         new BlackboardCondition("targetOnRight", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART, new Action(() => Turn(0.9f))),
+                        //if non AI tank is to the right of the AI controlled tank then turn to the right
 
-                        new BlackboardCondition("targetOnRight", Operator.IS_EQUAL, false, Stops.IMMEDIATE_RESTART, new Action(() => Turn(0.9f)))
-                                             
+                        new BlackboardCondition("targetOnRight", Operator.IS_EQUAL, false, Stops.IMMEDIATE_RESTART, new Action(() => Turn(-0.9f)))
+                        //if the non AI tank is not to the right of the AI controlled tank then turn left.                      
                           
                     )
                 )
@@ -97,33 +100,34 @@ namespace Complete
 //---------------------------------------------------------------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------Deadly behaviour ----------------------------------------------------------------
-        private Root Deadly()
+        private Root PossiblyDeadly()
         {
             return new Root(
                 new Service(0.2f, UpdatePerception, new Selector(
                     
                              new BlackboardCondition("targetOffCentre", Operator.IS_SMALLER_OR_EQUAL, 0.1f, Stops.IMMEDIATE_RESTART,
-                             //if tank is not facing the enemy then turn
-                             //new Action(() => Turn(0.2f))
+                             //if non AI controlled tank is facing the AI controlled tank within 0.1f then a sequence begins with stop turning, wait 
+                             //and then randomly shoot. 
+                             
                              new Sequence(StopTurning(), new Wait(1f), RandomFire())
                              ),
 
                              new BlackboardCondition("targetOnRight", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
-                             //if tank is not facing the enemy then turn
+                             //if the tank is to the right of the enemy tank then turn right
                              new Action(() => Turn(0.2f))),
 
                              new BlackboardCondition("targetOnRight", Operator.IS_EQUAL, false, Stops.IMMEDIATE_RESTART,
-                             //if tank is not facing the enemy then turn
+                             //if the tank is NOT to the right of the enemy tank then turn left
                              new Action(() => Turn(-0.2f))),
 
                             new BlackboardCondition("targetDistance", Operator.IS_SMALLER_OR_EQUAL, 15f, Stops.IMMEDIATE_RESTART, 
-                            //if the enemy is NOT the distance field then move towards the enemy
+                            //if the enemy is NOT within the distance field of 15f (pixels) then move towards the enemy
                             new Action(() => Move(0.1f))),
 
                             new BlackboardCondition("targetInFront", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
                            // LOOK FOR ENEMY, if enemy is in front then stop turning and shoot
-                           // new Sequence(StopTurning(), new Wait(2f), RandomFire())
-                           new Sequence(StopTurning())
+                           // new Sequence(StopTurning(), new Wait(2f), RandomFire()) (was going to use this)
+                           new Sequence(StopTurning()) 
                             )
                 )
                 )
@@ -132,7 +136,7 @@ namespace Complete
         //---------------------------------------------------------------------------------------------------------------------------------------------
 
         //---------------------------------------------------------------Frightened behaviour ----------------------------------------------------------------
-        private Root Frightened()
+        private Root TooFrightened()
         {
             return new Root(
                 new Service(0.2f, UpdatePerception,
@@ -140,9 +144,13 @@ namespace Complete
 
                         new BlackboardCondition("targetDistance", Operator.IS_SMALLER_OR_EQUAL, 25f, Stops.IMMEDIATE_RESTART,
                              new Action(() => Move(-1f))),
-
+                        //if the non AI controlled tank is within the distance field of 25f then move away and back off.
+                    
+   
                         new BlackboardCondition("targetDistance", Operator.IS_SMALLER_OR_EQUAL, 50f, Stops.IMMEDIATE_RESTART,
                              new Sequence(StopTurning(), new Wait(0.5f), RandomFire()))
+                             //if the non AI controlled tank is even more within the distance field of 50 this time then stop turning, wait 
+                             //and randomly fire
 
                         
                            //it will just act scared, shoot and end up being cornered
@@ -154,7 +162,7 @@ namespace Complete
         //---------------------------------------------------------------------------------------------------------------------------------------------
 
         //---------------------------------------------------------------Unpredictable behaviour ----------------------------------------------------------------
-        private Root Unpredictable(float randomMove)
+        private Root TrulyFunny(float randomMove)
         {
             return new Root(
                 new Service(0.2f, UpdatePerception,

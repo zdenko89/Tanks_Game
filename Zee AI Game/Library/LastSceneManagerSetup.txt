@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/_Completed-Assets/Scenes/third save.unity
+- path: Assets/_Completed-Assets/Scenes/final save.unity
   isLoaded: 1
   isActive: 1
