@@ -160,13 +160,32 @@ namespace Complete
                 new Service(0.2f, UpdatePerception,
                     new Selector(
 
+                        //Wasn't too sure what to do for unpredictable without using too many random floats so I decided to go with this and simply
+                        // go with this outcome and make it difficult to kill. 
+
                         new BlackboardCondition("targetInFront", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
+                        //if the target is in front then turn towards, move and shoot.
 
-                            new Sequence(new Action(() => Move(1)), new Action(() => Fire(1))))
+                            new Sequence(new Action(() => Turn(randomMove)), new Action(() => Move(1)), new Action(() => Fire(1)))),
 
-                            
 
-                                                        
+
+                          new BlackboardCondition("targetInFront", Operator.IS_EQUAL, false, Stops.IMMEDIATE_RESTART,
+                          //if the rarget isn't in front then turn, move and shoot. 
+
+                            new Sequence(new Action(() => Turn(randomMove)), new Action(() => Move(-1)), new Action(() => Fire(1)))),
+
+
+
+
+                            new BlackboardCondition("targetOnRight", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
+
+                            new Sequence(new Action(() => Turn(0.2f)), new Action(() => Move(-1)), new Action(() => Fire(1)))),
+
+
+                            new BlackboardCondition("targetOnRight", Operator.IS_EQUAL, false, Stops.IMMEDIATE_RESTART,
+
+                            new Sequence(new Action(() => Turn(0.2f)), new Action(() => Move(-1)), new Action(() => Fire(1))))
                     )
                 )
             );
